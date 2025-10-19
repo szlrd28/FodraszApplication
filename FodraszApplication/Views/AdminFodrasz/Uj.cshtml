@@ -1,0 +1,27 @@
+﻿@model FodraszApplication.Models.Fodrasz
+@{
+    ViewData["Title"] = "Új fodrász";
+}
+<h1>Új fodrász</h1>
+
+<form asp-action="Uj" method="post" class="card p-3">
+    <div class="mb-3">
+        <label asp-for="Nev" class="form-label"></label>
+        <input asp-for="Nev" class="form-control" />
+        <span asp-validation-for="Nev" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Bemutatkozas" class="form-label"></label>
+        <textarea asp-for="Bemutatkozas" class="form-control"></textarea>
+    </div>
+    <div class="mb-3">
+        <label asp-for="FotoUrl" class="form-label"></label>
+        <input asp-for="FotoUrl" class="form-control" />
+    </div>
+    <button class="btn btn-primary">Mentés és nyitvatartás</button>
+    <a asp-action="Index" class="btn btn-outline-secondary ms-2">Mégse</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

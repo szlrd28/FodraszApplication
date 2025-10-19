@@ -1,0 +1,56 @@
+﻿@model FodraszApplication.ViewModels.FodraszNyitvatartasVM
+@{
+    ViewData["Title"] = "Nyitvatartás – " + Model.FodraszNev;
+}
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Nyitvatartas" method="post">
+    <input type="hidden" asp-for="FodraszId" />
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Nap</th>
+                <th>Zárva</th>
+                <th>Nyitás</th>
+                <th>Zárás</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Napok.Count; i++)
+            {
+                <tr>
+                    <td>@Model.Napok[i].NapNeve</td>
+                    <td class="text-center">
+                        <input asp-for="Napok[i].Zarva" class="form-check-input" />
+                    </td>
+                    <td>
+                        <input asp-for="Napok[i].Nyitas" type="time" class="form-control" />
+                    </td>
+                    <td>
+                        <input asp-for="Napok[i].Zaras" type="time" class="form-control" />
+                    </td>
+
+                   
+                    <input type="hidden" asp-for="Napok[i].Nap" />
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button class="btn btn-primary">Mentés</button>
+    <a asp-action="Index" class="btn btn-outline-secondary ms-2">Vissza</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        
+        document.querySelectorAll('input[type=checkbox][name*="Zarva"]').forEach(cb => {
+            const row = cb.closest('tr');
+            const times = row.querySelectorAll('input[type=time]');
+            function toggle() { times.forEach(t => t.disabled = cb.checked); }
+            cb.addEventListener('change', toggle);
+            toggle(); 
+        });
+    </script>
+}

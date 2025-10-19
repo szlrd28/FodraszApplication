@@ -1,0 +1,173 @@
+﻿@model FodraszApplication.ViewModels.IdopontLetrehozasVM
+@{
+    ViewData["Title"] = "Időpont foglalása";
+}
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<form id="szuro" method="get" asp-action="Letrehozas" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <label asp-for="FodraszId" class="form-label">Fodrász</label>
+        <select asp-for="FodraszId" asp-items="Model.FodraszLista" class="form-select">
+            <option value="">Válassz fodrászt…</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Datum" class="form-label">Dátum</label>
+        <input asp-for="Datum" type="text" class="form-control" id="datumPicker" autocomplete="off" />
+    </div>
+
+    <div class="col-md-5">
+        <label asp-for="SzolgaltatasKod" class="form-label">Szolgáltatás</label>
+        <select asp-for="SzolgaltatasKod" asp-items="Model.SzolgaltatasLista" class="form-select"></select>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Időtartam</label>
+        <input class="form-control" value="@Model.IdotartamPerc perc" readonly />
+        <input type="hidden" asp-for="IdotartamPerc" />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Ár (Ft)</label>
+        <input class="form-control" value="@($"{Model.ArHuf:N0} Ft")" readonly />
+        <input type="hidden" asp-for="ArHuf" />
+    </div>
+</form>
+
+@if (Model.FodraszId <= 0)
+{
+    <div class="alert alert-secondary">Válassz fodrászt, dátumot és szolgáltatást a szabad időpontokhoz.</div>
+}
+else if (Model.ZarvaNap)
+{
+    <div class="alert alert-warning">
+        @(!string.IsNullOrWhiteSpace(Model.ZarvaUzenet) ? Model.ZarvaUzenet : "Ezen a napon nem foglalható időpont.")
+    </div>
+    <a asp-controller="Fooldal" asp-action="Index" class="btn btn-outline-secondary">Vissza</a>
+}
+else if (Model.SzabadIdosavok?.Any() == true)
+{
+    <form asp-action="Letrehozas" method="post" class="card p-3">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <input type="hidden" asp-for="FodraszId" />
+        <input type="hidden" asp-for="Datum" />
+        <input type="hidden" asp-for="SzolgaltatasKod" />
+        <input type="hidden" asp-for="IdotartamPerc" />
+        <input type="hidden" asp-for="ArHuf" />
+
+        <div class="mb-3">
+            <label asp-for="Kezdet" class="form-label">Szabad időpontok</label>
+            <select asp-for="Kezdet" asp-items="Model.SzabadIdosavok" class="form-select"></select>
+            <span asp-validation-for="Kezdet" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex">
+            <button type="submit" class="btn btn-primary">Foglalás</button>
+            <a asp-controller="Fooldal" asp-action="Index" class="btn btn-outline-secondary ms-2">Vissza</a>
+        </div>
+    </form>
+}
+else
+{
+    <div class="alert alert-info">Nincs szabad időpont a megadott napon a választott szolgáltatáshoz.</div>
+    <a asp-controller="Fooldal" asp-action="Index" class="btn btn-outline-secondary">Vissza</a>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/hu.js"></script>
+
+    <style>
+        /* Alap: kör alakú “gomb” megjelenés a jelölt napokon */
+        .flatpickr-day.nyitva,
+        .flatpickr-day.zarva {
+            border-radius: 50% !important;
+        }
+
+        /* Foglalható nap – halvány kék kör */
+        .flatpickr-day.nyitva {
+            background: #eaf4ff !important;
+            color: #0b3d62 !important;
+        }
+
+            .flatpickr-day.nyitva:hover {
+                filter: brightness(0.97);
+            }
+
+        /* Zárt nap – halvány piros kör; a Flatpickr disabled szürkeségét felülírjuk */
+        .flatpickr-day.zarva,
+        .flatpickr-day.zarva.flatpickr-disabled,
+        .flatpickr-day.flatpickr-disabled.zarva {
+            background: #ffe2e2 !important;
+            color: #9b1c1c !important;
+            opacity: 1 !important; /* ne legyen kifakítva */
+            cursor: not-allowed;
+        }
+
+        /* Kijelölt nap maradjon egyértelmű */
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange {
+            background: #3b82f6 !important;
+            color: #fff !important;
+        }
+    </style>
+
+    <script>
+        // .NET -> JS listák
+        const zarvaNapok    = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ZarvaNapok));
+        const nyitvaNapok   = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.NyitvaNapok));
+        const cegZarvaNapok = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CegZarvaNapok ?? new List<string>()));
+        const defaultDate   = "@Model.Datum.ToString("yyyy-MM-dd")";
+
+        const hu = flatpickr.l10ns.hu; hu.firstDayOfWeek = 1;
+
+        flatpickr("#datumPicker", {
+          locale: hu,
+          dateFormat: "Y-m-d",
+          defaultDate: defaultDate,
+
+          // zárt napok tiltása (nem választható)
+          disable: [
+             (date) => zarvaNapok.includes(flatpickr.formatDate(date, "Y-m-d"))
+          ],
+
+          // napok “karikázása”
+          onDayCreate: (_dObj, _dStr, _fp, dayElem) => {
+            const ymd = flatpickr.formatDate(dayElem.dateObj, "Y-m-d");
+
+            if (zarvaNapok.includes(ymd)) {
+              dayElem.classList.add("zarva");
+              // globális ünnepnapra külön tooltip
+              if (cegZarvaNapok.includes(ymd)) {
+                dayElem.title = "Zárva vagyunk";
+                dayElem.setAttribute("aria-label", "Zárva vagyunk");
+              } else {
+                dayElem.title = "Nem foglalható";
+              }
+            } else if (nyitvaNapok.includes(ymd)) {
+              dayElem.classList.add("nyitva");
+            }
+          },
+
+          // dátumváltáskor töltse újra a szabad idősávokat
+          onChange: function () { document.getElementById("szuro").submit(); }
+        });
+
+        // bármelyik szűrőváltozás GET-tel frissít
+        document.getElementById('szuro').addEventListener('change', function () { this.submit(); });
+    </script>
+}
+
+
+    
+
+
+
+

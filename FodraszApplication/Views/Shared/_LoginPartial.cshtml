@@ -1,0 +1,53 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using FodraszApplication.Models
+@inject SignInManager<Felhasznalo> SignInManager
+@inject UserManager<Felhasznalo> UserManager
+
+<ul class="navbar-nav ms-auto">
+    @if (SignInManager.IsSignedIn(User))
+    {
+
+        @if (User.IsInRole("Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="AdminFodrasz" asp-action="Index">Admin – Fodrászok</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="FodraszPanel" asp-action="Foglalasaim">Fodrász panel</a>
+            </li>
+            <li class="nav-item"><a class="nav-link" asp-controller="AdminSzolgaltatas" asp-action="Index">Admin – Árlista</a></li>
+        }
+        }
+
+        @* Fodrász/.Admin menü *@
+        @if (User.IsInRole("Fodrasz") || User.IsInRole("Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="FodraszPanel" asp-action="Foglalasaim">Fodrász panel</a>
+            </li>
+        }
+
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Idopontok" asp-action="Enyem">Foglalásaim</a>
+        </li>
+        <li class="nav-item">
+            <form class="d-inline" asp-area="Identity" asp-page="/Account/Logout"
+                  asp-route-returnUrl="@Url.Action("Index", "Fooldal")" method="post">
+                <button type="submit" class="btn btn-link nav-link">Kilépés</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link"
+               asp-area="Identity" asp-page="/Account/Login"
+               asp-route-returnUrl="/after-login">Belépés</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               asp-area="Identity" asp-page="/Account/Register"
+               asp-route-returnUrl="/after-login">Regisztráció</a>
+        </li>
+    }
+</ul>

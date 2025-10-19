@@ -1,0 +1,76 @@
+﻿@model IEnumerable<FodraszApplication.ViewModels.FodraszFoglalasSorVM>
+@{
+    ViewData["Title"] = "Foglalásaim";
+}
+@if (User.IsInRole("Admin"))
+{
+    <div class="mb-3 text-end">
+        <a class="btn btn-primary"
+           asp-controller="AdminSzolgaltatas"
+           asp-action="Index">
+            Admin – Árlista
+        </a>
+    </div>
+}
+@if (User.IsInRole("Admin"))
+{
+    <div class="mb-3">
+        <a class="btn btn-outline-secondary"
+           asp-controller="AdminFodrasz" asp-action="Index">
+            ← Vissza az adminhoz
+        </a>
+    </div>
+}
+<h1>@ViewBag.FodraszNev – foglalások</h1>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <label class="form-label">Dátumtól</label>
+        <input type="date" name="tol" class="form-control" value="@(((DateTime)ViewBag.Tol).ToString("yyyy-MM-dd"))" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Dátumig</label>
+        <input type="date" name="ig" class="form-control" value="@(((DateTime)ViewBag.Ig).ToString("yyyy-MM-dd"))" />
+    </div>
+    <div class="col-auto d-flex align-items-end">
+        <button class="btn btn-secondary">Szűrés</button>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Nincs foglalás a megadott időszakban.</div>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Fodrász</th>
+                <th>Dátum</th>
+                <th>Idő</th>
+                <th>Ügyfél</th>
+                <th>Szolgáltatás</th>
+                <th>Időtartam</th>
+                <th class="text-end">Ár</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.FodraszNev</td> @* *@
+                    <td>@r.Kezdet.ToString("yyyy.MM.dd.")</td>
+                    <td>@r.Kezdet.ToString("HH:mm")–@r.Vege.ToString("HH:mm")</td>
+                    <td>
+                        @(string.IsNullOrWhiteSpace(r.UgyfelNev) ? r.UgyfelEmail : r.UgyfelNev)
+                        <div class="text-muted small">@r.UgyfelEmail</div>
+                    </td>
+                    <td>@r.Szolgaltatas</td>
+                    <td>@r.IdotartamPerc perc</td>
+                    <td class="text-end">@($"{r.ArHuf:N0} Ft")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

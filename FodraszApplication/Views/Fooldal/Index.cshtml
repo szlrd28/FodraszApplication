@@ -1,0 +1,36 @@
+﻿@model IEnumerable<FodraszApplication.Models.Fodrasz>
+@{
+    ViewData["Title"] = "Fodrászok";
+}
+<h1 class="mb-3">Fodrászaink</h1>
+
+<div class="row">
+    @foreach (var f in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="ratio ratio-16x9 overflow-hidden rounded-top">
+                    <img class="w-100 h-100" style="object-fit:cover; object-position:center"
+                         src="@(string.IsNullOrWhiteSpace(f.FotoUrl) ? "/img/bildcomming.jpg" : f.FotoUrl)"
+                         alt="@f.Nev">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@f.Nev</h5>
+                    <p class="card-text">@f.Bemutatkozas</p>
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <a class="btn btn-primary" asp-controller="Idopontok" asp-action="Letrehozas" asp-route-fodraszId="@f.Id">
+                            Időpont foglalása
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-primary" asp-area="Identity" asp-page="/Account/Login">
+                            Bejelentkezés a foglaláshoz
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

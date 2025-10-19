@@ -1,0 +1,54 @@
+﻿@model IEnumerable<FodraszApplication.Models.Fodrasz>
+@{
+    ViewData["Title"] = "Fodrászok";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Fodrászok</h1>
+    <div>
+        <a class="btn btn-outline-danger me-2"
+           asp-action="ZarvaNapok">
+            Céges zárva napok
+        </a>
+        <a class="btn btn-outline-primary me-2"
+           asp-controller="FodraszPanel" asp-action="Foglalasaim">
+            Fodrász panel
+        </a>
+        <a class="btn btn-primary" asp-action="Uj">Új fodrász</a>
+    </div>
+</div>
+
+@if (TempData["Hiba"] is string hiba)
+{
+    <div class="alert alert-danger">@hiba</div>
+}
+@if (TempData["Uzenet"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr><th>Fodrász</th><th class="text-end">Műveletek</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var f in Model)
+        {
+            <tr>
+                <td>@f.Nev</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary me-1"
+                       asp-action="Nyitvatartas" asp-route-id="@f.Id">Nyitvatartás</a>
+
+                    <a class="btn btn-sm btn-outline-primary me-1"
+                       asp-action="Szerkesztes" asp-route-id="@f.Id">Szerkesztés</a>
+
+
+                    <form asp-action="Torles" asp-route-id="@f.Id" method="post" class="d-inline"
+                          onsubmit="return confirm('Biztosan törlöd @f.Nev fodrászt?');">
+                        <button class="btn btn-sm btn-danger">Törlés</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

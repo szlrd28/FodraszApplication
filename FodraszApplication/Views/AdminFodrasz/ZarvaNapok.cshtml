@@ -1,0 +1,62 @@
+﻿@model IEnumerable<FodraszApplication.Models.CegZarvaNap>
+@{
+    ViewData["Title"] = "Céges zárva napok";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["Hiba"] is string h)
+{
+    <div class="alert alert-danger">@h</div>
+}
+@if (TempData["Uzenet"] is string u)
+{
+    <div class="alert alert-success">@u</div>
+}
+
+<form asp-action="ZarvaNapHozzaadas" method="post" class="row g-2 mb-3">
+    <div class="col-auto">
+        <label class="form-label">Dátum</label>
+        <input type="date" name="datum" class="form-control"
+               value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+    </div>
+    <div class="col">
+        <label class="form-label">Megjegyzés</label>
+        <input type="text" name="megjegyzes" class="form-control" placeholder="pl. Ünnepnap" />
+    </div>
+    <div class="col-auto d-flex align-items-end">
+        <button class="btn btn-danger">Zárva nap hozzáadása</button>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Még nincs rögzített zárva nap.</div>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Dátum</th>
+                <th>Megjegyzés</th>
+                <th class="text-end">Művelet</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var z in Model)
+            {
+                <tr>
+                    <td>@z.Datum.ToString("yyyy.MM.dd.")</td>
+                    <td>@z.Megjegyzes</td>
+                    <td class="text-end">
+                        <form asp-action="ZarvaNapTorles" asp-route-id="@z.Id" method="post"
+                              onsubmit="return confirm('Törlöd ezt a zárva napot?');" class="d-inline">
+                            <button class="btn btn-sm btn-outline-danger">Törlés</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,81 @@
+﻿@model IEnumerable<FodraszApplication.ViewModels.UgyfelFoglalasSorVM>
+@{
+    ViewData["Title"] = "Saját foglalásaim";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@{
+    var uzenet = TempData["Uzenet"]?.ToString();
+    var fidStr = TempData["UtolsoFodraszId"]?.ToString();
+    int fid;
+    bool vanFodrasz = int.TryParse(fidStr, out fid);
+}
+
+@if (!string.IsNullOrEmpty(uzenet))
+{
+    <div class="alert alert-success d-flex align-items-center justify-content-between">
+        <span>@uzenet</span>
+        <div class="ms-3">
+            <a class="btn btn-sm btn-primary me-2"
+               asp-controller="Fooldal" asp-action="Index">
+                Vissza a fodrászokhoz
+            </a>
+            @if (vanFodrasz)
+            {
+                <a class="btn btn-sm btn-outline-primary"
+                   asp-controller="Idopontok" asp-action="Letrehozas"
+                   asp-route-fodraszId="@fid">
+                    Új időpont ennél
+                </a>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="mb-3">
+        <a class="btn btn-sm btn-outline-secondary"
+           asp-controller="Fooldal" asp-action="Index">
+            Vissza a fodrászokhoz
+        </a>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <p>Még nincs foglalásod.</p>
+}
+else
+{
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Fodrász</th>
+                <th>Kezdés</th>
+                <th>Vége</th>
+                <th>Szolgáltatás</th>
+                <th class="text-end">Ár (Ft)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model)
+            {
+                <tr>
+                    <td>@a.FodraszNev</td>
+                    <td>@a.Kezdet.ToString("yyyy.MM.dd. HH:mm")</td>
+                    <td>@a.Vege.ToString("HH:mm")</td>
+                    <td>@a.Szolgaltatas</td>
+                    <td class="text-end">@a.ArHuf.ToString("N0")</td>
+                    <td class="text-end">
+                        <form asp-action="Lemondas" method="post">
+                            <input type="hidden" name="id" value="@a.Id" />
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Lemondás</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

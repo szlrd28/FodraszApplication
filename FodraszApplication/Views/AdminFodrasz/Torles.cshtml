@@ -1,0 +1,33 @@
+﻿@model FodraszApplication.Models.Fodrasz
+@{
+    ViewData["Title"] = "Fodrász törlése";
+    var van = (bool)(ViewBag.VanFoglalas ?? false);
+    int ossz = ViewBag.Ossz ?? 0;
+    int jovo = ViewBag.Jovo ?? 0;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-warning">
+    Biztosan törlöd <strong>@Model.Nev</strong> fodrászt?
+    @if (van)
+    {
+        <div class="mt-2">
+            <strong>Figyelem:</strong> @ossz foglalás tartozik hozzá
+            (ebből jövőbeli: @jovo). Előbb töröld vagy helyezd át ezeket!
+        </div>
+    }
+</div>
+
+@if (!van)
+{
+    <form asp-action="TorlesMegerositve" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button class="btn btn-danger">Igen, törlöm</button>
+        <a asp-action="Index" class="btn btn-secondary">Mégse</a>
+    </form>
+}
+else
+{
+    <a asp-action="Index" class="btn btn-secondary">Vissza</a>
+}

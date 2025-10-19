@@ -1,0 +1,36 @@
+﻿@model FodraszApplication.Models.Fodrasz
+@{
+    ViewData["Title"] = "Fodrász szerkesztése";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Szerkesztes" asp-route-id="@Model.Id" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Nev" class="form-label"></label>
+        <input asp-for="Nev" class="form-control" />
+        <span asp-validation-for="Nev" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Bemutatkozas" class="form-label"></label>
+        <textarea asp-for="Bemutatkozas" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Bemutatkozas" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="FotoUrl" class="form-label"></label>
+        <input asp-for="FotoUrl" class="form-control" />
+        <div class="form-text">Üresen hagyva: /img/bildcomming.jpg</div>
+        <span asp-validation-for="FotoUrl" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-primary">Mentés</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Mégse</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

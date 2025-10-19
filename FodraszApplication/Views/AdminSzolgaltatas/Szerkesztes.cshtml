@@ -1,0 +1,50 @@
+﻿@model FodraszApplication.Models.Szolgaltatas
+@{
+    var edit = Model.Id != 0; ViewData["Title"] = edit ? "Szolgáltatás szerkesztése" : "Új szolgáltatás";
+}
+<h1>@ViewData["Title"]</h1>
+
+<form method="post" class="card p-3">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label asp-for="Kod" class="form-label"></label>
+            <input asp-for="Kod" class="form-control" />
+            <span asp-validation-for="Kod" class="text-danger"></span>
+        </div>
+        <div class="col-md-5">
+            <label asp-for="Nev" class="form-label"></label>
+            <input asp-for="Nev" class="form-control" />
+            <span asp-validation-for="Nev" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Kategoria" class="form-label"></label>
+            <input asp-for="Kategoria" class="form-control" />
+            <span asp-validation-for="Kategoria" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Perc" class="form-label"></label>
+            <input asp-for="Perc" class="form-control" type="number" min="5" max="600" />
+            <span asp-validation-for="Perc" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="ArHuf" class="form-label"></label>
+            <input asp-for="ArHuf" class="form-control" type="number" min="0" />
+            <span asp-validation-for="ArHuf" class="text-danger"></span>
+        </div>
+        <div class="col-md-2 d-flex align-items-center">
+            <div class="form-check mt-3">
+                <input class="form-check-input" asp-for="Aktiv" />
+                <label class="form-check-label" asp-for="Aktiv">Aktív</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <button class="btn btn-primary">Mentés</button>
+        <a asp-action="Index" class="btn btn-outline-secondary ms-2">Vissza</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
